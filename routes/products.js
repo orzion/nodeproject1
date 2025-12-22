@@ -2,15 +2,25 @@ const router = require('express').Router();
 
 const fs = require('fs');
 const path = require("path");
-const { Module } = require('vm');
 
-const filePath = path.join(__dirname, "products.json");
+const fileWithPath = path.join(__dirname, "products.json");
 
 const products  = [];
 
-router.get('/',(req,res)=>{
+router.get("/" , (req,res)=>{
 
-})
+    try {
+        const data = fs.readFileSync(fileWithPath , "utf-8");
+        if(!data){
+            return res.send("No Products in file")
+        }
+        const products = JSON.parse(data);
+        res.json(products);
 
+    } catch (error) {
+        res.send([]);
+    }
+
+});
 
 module.exports =  router;
