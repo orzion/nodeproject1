@@ -5,8 +5,6 @@ const path = require("path");
 //router.use(validateAdmin);
 const fileWithPath = path.join(__dirname, "products.json");
 
-const products  = [];
-
 router.get("/" , (req,res)=>{
 
     try {
@@ -48,7 +46,7 @@ const validateAdmin = (req, res, next) => {
     if (!isAdmin) {
         return res.status(401).send("You are not admin");
     }
-    
+
     next();
 };
 
@@ -66,7 +64,8 @@ router.post("/", validateAdmin, (req, res) => {
     }
 
     const product = req.body;
-    fs.writeFileSync(fileWithPath, JSON.stringify(product));
+    data.push(product);
+    fs.writeFileSync(fileWithPath, JSON.stringify(data));
     res.status(201).json("new product was added successfully");
 
 });
