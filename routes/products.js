@@ -22,11 +22,11 @@ router.get("/" , (req,res)=>{
 });
 
 router.get("/:id", (req,res)=>{
-    const idFromParams = Number(req.params.id);
+    const idFromParams = req.params.id;
     const data = JSON.parse(fs.readFileSync(fileWithPath , "utf-8"));
     const index = data.findIndex(p => p.id === idFromParams);
     if (index !== -1) {
-       return res .status(200).send(index);
+       return res.status(200).send(data[index]);
     }
     
     res.status(404).send("data not found");
@@ -69,6 +69,39 @@ router.post("/", validateAdmin, (req, res) => {
     fs.writeFileSync(fileWithPath, JSON.stringify(data));
     res.status(201).json("new product was added successfully");
 
+});
+
+router.put("/:id",validateAdmin,(req,res)=>{
+    const idFromParams = req.params.id;
+    const updatedId = req.body;
+    const name = req.body.name;
+    const price = Number(req.body.id);
+    const quantity = Number(req.body.id);
+    const data = JSON.parse(fs.readFileSync(fileWithPath,"utf-8"));
+    const index = data.findIndex(p => p.id === idFromParams);
+    
+    if(index === -1){
+        return res.status(404).send("product not found");
+    } 
+
+    updatedId.id=idFromParams;
+    data[index] = updatedId;
+    fs.writeFileSync(fileWithPath, JSON.stringify(data));
+    res.status(200).json("new product was edited successfully");
+});
+
+router.delete("/:id",validateAdmin,(req,res)=>{
+    const idFromParams = req.params.id;
+    const data = JSON.parse(fs.readFileSync(fileWithPath,"utf-8"));
+    const index = data.findIndex(p => p.id === idFromParams);
+    
+    if(index === -1){
+        return res.status(404).send("product not found");
+    } 
+
+    data.splice(index, 1);
+    fs.writeFileSync(fileWithPath, JSON.stringify(data));
+    res.status(200).json("new product was deleted successfully");
 });
 
 module.exports =  router;
