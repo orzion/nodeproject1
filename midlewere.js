@@ -17,4 +17,6 @@ const validateAdmin = (req, res, next) => {
     next();
 };
 
-module.exports  = validateAdmin;
+router.use('/',validateAdmin);
+
+/*module.exports  = router;*/

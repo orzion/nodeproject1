@@ -1,5 +1,5 @@
 const router = require('express').Router();
-//const validateAdmin = require('../midlewere.js')
+//const validateAdmin = require('../midlewere.js');
 const fs = require('fs');
 const path = require("path");
 //router.use(validateAdmin);
@@ -52,14 +52,15 @@ const validateAdmin = (req, res, next) => {
 
 
 router.post("/", validateAdmin, (req, res) => {
+    const fileWith = path.join(__dirname,"products.json")
     const id = req.body.id;
     const name = req.body.name;
     const price = Number(req.body.id);
     const quantity = Number(req.body.id);
-    const data = JSON.parse(fs.readFileSync(fileWithPath , "utf-8"));
-    const index = data.findIndex(p => p.id === id);
-
-    if(!index){
+    const data = JSON.parse(fs.readFileSync(fileWith , "utf-8"));
+    const index = data.find(p => p.id === id);
+    console.log(index);
+    if(index!==undefined){
         return res.status(409).send("product exsits already");
     }
 
