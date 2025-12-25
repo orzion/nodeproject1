@@ -1,8 +1,6 @@
 const router = require('express').Router();
-//const validateAdmin = require('../midlewere.js');
 const fs = require('fs');
 const path = require("path");
-//router.use(validateAdmin);
 const fileWithPath = path.join(__dirname, "products.json");
 
 router.get("/" , (req,res)=>{
@@ -50,44 +48,39 @@ const validateAdmin = (req, res, next) => {
     next();
 };
 
-
-router.post("/", validateAdmin, (req, res) => {
-    const fileWith = path.join(__dirname,"products.json")
+router.post("/", validateAdmin,(req,res)=>{
     const id = req.body.id;
     const name = req.body.name;
-    const price = Number(req.body.id);
-    const quantity = Number(req.body.id);
-    const data = JSON.parse(fs.readFileSync(fileWith , "utf-8"));
-    const index = data.find(p => p.id === id);
-    console.log(index);
-    if(index!==undefined){
-        return res.status(409).send("product exsits already");
-    }
+    const price = Number(req.body.price);
+    const quantity = Number(req.body.quantity);
+    const category = req.body.category;
 
-    const product = req.body;
-    data.push(product);
+    const data = JSON.parse(fs.readFileSync(fileWithPath,"utf-8"));
+    const index = data.find(p => p.id === id);
+    
+    if(index !== undefined || id === undefined || name===undefined || price===null || quantity===null || category===undefined){
+        return res.status(409).send("product exsits already or not filed as needed!!")
+    } 
+    const products = req.body;
+    data.push(products);
     fs.writeFileSync(fileWithPath, JSON.stringify(data));
     res.status(201).json("new product was added successfully");
-
 });
 
 router.put("/:id",validateAdmin,(req,res)=>{
     const idFromParams = req.params.id;
     const updatedId = req.body;
-    const name = req.body.name;
-    const price = Number(req.body.id);
-    const quantity = Number(req.body.id);
     const data = JSON.parse(fs.readFileSync(fileWithPath,"utf-8"));
     const index = data.findIndex(p => p.id === idFromParams);
     
     if(index === -1){
-        return res.status(404).send("product not found");
+        return res.status(404).send("product not found!!");
     } 
 
     updatedId.id=idFromParams;
     data[index] = updatedId;
     fs.writeFileSync(fileWithPath, JSON.stringify(data));
-    res.status(200).json("new product was edited successfully");
+    res.status(200).json("product was edited successfully");
 });
 
 router.delete("/:id",validateAdmin,(req,res)=>{
@@ -101,7 +94,7 @@ router.delete("/:id",validateAdmin,(req,res)=>{
 
     data.splice(index, 1);
     fs.writeFileSync(fileWithPath, JSON.stringify(data));
-    res.status(200).json("new product was deleted successfully");
+    res.status(200).json("product was deleted successfully");
 });
 
 module.exports =  router;

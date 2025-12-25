@@ -1,7 +1,1 @@
-[{
-  "id": "a1",
-  "name": "David Cohen",
-  "username": "admin1",
-  "password": "1234"
-}
-]
+[{"id":"a1","name":"David Cohen","username":"admin1","password":"1234"},{"id":"a2","name":"David Cohen","username":"admin1","password":"1234"},{"id":"a3","name":"David Cohen","username":"admin1","password":"1234"},{"id":"a4","name":"David Cohen","username":"admin1","password":"1234"},{"id":"a5","name":"David Cohen","username":"admin1","password":"1234"},{"id":"a6","name":"David Co","username":"admin23","password":"1234"},{"id":"a7","name":"David Co","username":"admin2323","password":"123434or"},{"id":"a8","name":"David Co","username":"admin232356","password":"$2b$10$Ekh4B7aHfU2bSozF6dleNu5CtiJoKgwR9qLeZRFEnmyyiZfXyKYi2"}]
