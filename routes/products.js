@@ -2,6 +2,7 @@ const router = require('express').Router();
 const fs = require('fs');
 const path = require("path");
 const fileWithPath = path.join(__dirname, "products.json");
+const bcrypt = require("bcrypt");
 
 router.get("/" , (req,res)=>{
 
@@ -31,13 +32,20 @@ router.get("/:id", (req,res)=>{
 });
 
 
-const validateAdmin = (req, res, next) => {
+/*const validateAdmin = (req, res, next) => {
     const fs  = require("fs");
     const adminPath = path.join(__dirname, "admin.json");
     const admins = JSON.parse(fs.readFileSync(adminPath, "utf-8"));
 
     const username = req.query.username;
     const password = req.query.password;
+    bcrypt.compare(password, admins.password, (err, result) => {
+        if (!result) {
+            return res.status(401).send("username or password incorrect");
+        }
+
+        res.status(200).send("login success");
+    });
 
     const isAdmin = admins.find(a => a.password === password && a.username === username);
 
@@ -45,7 +53,35 @@ const validateAdmin = (req, res, next) => {
         return res.status(401).send("You are not admin");
     }
 
+
+
     next();
+};*/
+
+const validateAdmin = (req, res, next) => {
+
+    const fileWithPath = path.join(__dirname, "admin.json");
+    const admins = JSON.parse(fs.readFileSync(fileWithPath, "utf-8"));
+
+    const username = req.query.username;
+    const password = req.query.password;
+
+    // חיפוש אדמין לפי username בלבד
+    const admin = admins.find(a => a.username === username);
+
+    if (!admin) {
+        return res.status(401).send("You are not admin!");
+    }
+
+    // השוואת סיסמה ב-bcrypt
+    bcrypt.compare(password, admin.password, (err, result) => {
+
+        if (!result) {
+            return res.status(401).send("You are not admin!");
+        }
+
+        next(); 
+    });
 };
 
 router.post("/", validateAdmin,(req,res)=>{
