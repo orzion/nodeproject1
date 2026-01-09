@@ -31,33 +31,6 @@ router.get("/:id", (req,res)=>{
     res.status(404).send("data not found");
 });
 
-
-/*const validateAdmin = (req, res, next) => {
-    const fs  = require("fs");
-    const adminPath = path.join(__dirname, "admin.json");
-    const admins = JSON.parse(fs.readFileSync(adminPath, "utf-8"));
-
-    const username = req.query.username;
-    const password = req.query.password;
-    bcrypt.compare(password, admins.password, (err, result) => {
-        if (!result) {
-            return res.status(401).send("username or password incorrect");
-        }
-
-        res.status(200).send("login success");
-    });
-
-    const isAdmin = admins.find(a => a.password === password && a.username === username);
-
-    if (!isAdmin) {
-        return res.status(401).send("You are not admin");
-    }
-
-
-
-    next();
-};*/
-
 const validateAdmin = (req, res, next) => {
 
     const fileWithPath = path.join(__dirname, "admin.json");
