@@ -1,8 +1,49 @@
 const router = require("express").Router();
 const bcrypt = require("bcrypt");
+const jwt = require('jsonwebtoken');
 const fs = require("fs");
 const path = require("path");
+require('dotenv').config();
 const fileWithPath = path.join(__dirname,"admin.json");
+const data = JSON.parse(fs.readFileSync(fileWithPath , "utf-8"));
+
+router.post('/login',(req,res)=>{
+    const {username,password} = req.body;
+    const index = data.find(a => a.username===username && a.password === password);
+    if(index){
+        const token = jwt.sign(
+            { username: username},
+            process.env.ACSES_TOKEN,
+            { expiresIn: "1h" }
+
+       );
+       return res.json({"token": token });
+    }
+    res.status(401).json({ message: "Invalid credentials" });
+})
+
+
+const auth = (req, res, next)=> {
+
+const header = req.headers["authorization"];
+const  token = header.split(" ")[1];
+if(!token){
+    return  res.status(501).send("no token was sent");
+}
+jwt.verify(token, process.env.ACSES_TOKEN,(err,username)=>{
+    if(err){
+        return res.status(403).json({ message: "Invalid token" });
+    }
+    req.username = username;
+})
+next();
+};
+
+
+
+router.get("/homepage",auth,(req,res)=>{
+    res.json(req.username);
+})
 
 
 router.get("/" , (req,res)=>{
