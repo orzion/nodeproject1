@@ -7,42 +7,80 @@ require('dotenv').config();
 const fileWithPath = path.join(__dirname,"admin.json");
 const data = JSON.parse(fs.readFileSync(fileWithPath , "utf-8"));
 
-router.post('/login',(req,res)=>{
+const loginM = (req,res,next)=>{
     const {username,password} = req.body;
+    if(username==undefined || password==undefined){
+       return res.status(409).send("error mast send passsword and username");
+    }
+    next();
+}
+
+const ref_tokenArr = [];
+router.post('/login',loginM,(req,res)=>{
+    const {username,password} = req.body;
+     
     const index = data.find(a => a.username===username && a.password === password);
+    const user = {
+        id: index.id,
+        username: index.username
+    }
     if(index){
         const token = jwt.sign(
-            { username: username},
+            { user: user},
             process.env.ACSES_TOKEN,
+            { expiresIn: "30s" }
+
+       );
+       const ref_token = jwt.sign(
+            { user: user},
+            process.env.REFRESH_TOKEN,
             { expiresIn: "1h" }
 
        );
-       return res.json({"token": token });
+       ref_tokenArr.push(ref_token);
+       return res.status(201).json({ token,ref_token });
     }
-    res.status(401).json({ message: "Invalid credentials" });
+    res.status(404).json({ message: "User not found" });
 })
 
 
 const auth = (req, res, next)=> {
 
-const header = req.headers["authorization"];
-const  token = header.split(" ")[1];
-if(!token){
-    return  res.status(501).send("no token was sent");
-}
-jwt.verify(token, process.env.ACSES_TOKEN,(err,username)=>{
+ const header = req.headers["authorization"];
+ const token =  header && header.split(" ")[1];
+   if(!token){
+    return  res.status(404).send("no token was found");
+   }
+  jwt.verify(token, process.env.ACSES_TOKEN,(err,user)=>{
     if(err){
         return res.status(403).json({ message: "Invalid token" });
     }
-    req.username = username;
-})
-next();
+    req.user = user;
+   })
+   next();
 };
 
 
 
 router.get("/homepage",auth,(req,res)=>{
-    res.json(req.username);
+    res.status(200).json(req.user);
+})
+
+router.post('/logout',(req,res)=>{
+
+})
+
+router.post('/refresh',(req,res)=>{
+    const header = req.headers["authorization"];
+    const token =  header && header.split(" ")[1];
+    console.log(ref_tokenArr);
+    if(!token)
+        return res.status(403).send("no token ref")
+    const fondtoken = ref_tokenArr.find((tokenfound) => tokenfound===token);
+    if(!fondtoken)
+        return res.status(403).send("no token ref")
+    const token1 = jwt.sign({ user: req.user},process.env.ACSES_TOKEN,{ expiresIn: "50s" });
+    res.status(200).json(token1);
 })
 
 
